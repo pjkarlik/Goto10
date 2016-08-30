@@ -5,8 +5,8 @@
 class Mouse {
   constructor(element) {
     this.element = element || window;
-    this.x = 0;
-    this.y = 0;
+    this.x = ~~(document.documentElement.clientWidth, window.innerWidth || 0) / 2;
+    this.y = ~~(document.documentElement.clientWidth, window.innerWidth || 0) / 2;
     this.pointer = this.pointer.bind(this);
     this.getCoordinates = this.getCoordinates.bind(this);
     this.events = ['mouseenter', 'mousemove'];
@@ -45,6 +45,7 @@ class Point {
     this.diag = obj.diag;
     this.index = obj.index;
     this.hue = obj.hue;
+    this.color = `hsl(${this.hue}, 100%, 50%)`;
     this.mouse = new Mouse();
     this.integrate = this.integrate.bind(this);
   }
@@ -53,14 +54,14 @@ class Point {
     const point = this.getVector();
     const damp = this.size * 0.025;
     const distance = this.distance();
-    this.vx = this.x - (point.x * damp) * ((this.radius - distance) / 75);
-    this.vy = this.y - (point.y * damp) * ((this.radius - distance) / 75);
+    this.vx = this.x - (point.x * damp) * ((this.radius - distance) / 125);
+    this.vy = this.y - (point.y * damp) * ((this.radius - distance) / 125);
   }
 
   getPoints() {
     return {
       index: this.index,
-      hue: this.hue,
+      color: this.color,
       x: this.vx,
       y: this.vy,
     };
@@ -88,6 +89,11 @@ class Point {
   }
 
   update() {
+    this.hue += 1;
+    if (this.hue > 360) {
+      this.hue = 0;
+    }
+    this.color = `hsl(${this.hue}, 100%, 50%)`;
     this.integrate();
   }
 }
@@ -96,7 +102,8 @@ export default class Render {
   constructor(element) {
     // Screen Set Up //
     this.element = element;
-    this.grid = 15;
+    this.grid = 25;
+    this.lineThickness = 2;
     // render const //
     this.width = fastfloor(document.documentElement.clientWidth, window.innerWidth || 0);
     this.height = fastfloor(document.documentElement.clientHeight, window.innerHeight || 0);
@@ -108,10 +115,11 @@ export default class Render {
     this.surface = this.canvas.getContext('2d');
     this.surface.scale(1, 1);
     this.createPoints = this.createPoints.bind(this);
+    this.resetCanvas = this.resetCanvas.bind(this);
     this.renderLoop = this.renderLoop.bind(this);
     this.createPoints();
     this.renderLoop();
-    // run function //
+    window.addEventListener('resize', this.resetCanvas);
   }
 
   createCanvas(name) {
@@ -123,13 +131,28 @@ export default class Render {
     return canvasElement;
   }
 
+  resetCanvas() {
+    window.cancelAnimationFrame(this.renderLoop);
+    this.width = fastfloor(document.documentElement.clientWidth, window.innerWidth || 0);
+    this.height = fastfloor(document.documentElement.clientHeight, window.innerHeight || 0);
+    this.rows = fastfloor(this.width / this.grid);
+    this.cols = fastfloor(this.height / this.grid);
+    this.canvas.width = this.width;
+    this.canvas.height = this.height;
+    this.surface = this.canvas.getContext('2d');
+    this.surface.scale(1, 1);
+    this.points = [];
+    this.createPoints();
+    this.renderLoop();
+  }
+
   createPoints() {
     for (let y = 0; y < this.cols; y++) {
       for (let x = 0; x < this.rows; x++) {
         const point = new Point({
           x: (this.grid / 2) + x * this.grid,
           y: (this.grid / 2) + y * this.grid,
-          hue: `hsl(${y * (360 / this.cols)}, 100%, 50%)`,
+          hue: y * (360 / this.cols),
           size: 3,
           radius: 210,
           index: {
@@ -145,9 +168,8 @@ export default class Render {
 
   drawLine(point1, point2) {
     this.surface.beginPath();
-    this.surface.strokeStyle = point1.hue;
-    this.surface.lineWidth = 2;
-    this.surface.lineCap = 'round';
+    this.surface.strokeStyle = point1.color;
+    this.surface.lineWidth = this.lineThickness;
     this.surface.moveTo(point1.x, point1.y);
     this.surface.lineTo(point2.x, point2.y);
     this.surface.stroke();

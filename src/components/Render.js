@@ -13,6 +13,15 @@ class Point {
     this.diag = obj.diag;
     this.index = obj.index;
     this.hue = obj.hue;
+    this.color = `hsl(${this.hue}, 100%, 50%)`;
+  }
+
+  update() {
+    this.hue += 1;
+    if (this.hue > 360) {
+      this.hue = 0;
+    }
+    this.color = `hsl(${this.hue}, 100%, 50%)`;
   }
 }
 // Render Class //
@@ -32,6 +41,7 @@ export default class Render {
     this.surface = this.canvas.getContext('2d');
     this.surface.scale(1, 1);
     this.renderLoop = this.renderLoop.bind(this);
+    this.drawLine = this.drawLine.bind(this);
     this.resetCanvas = this.resetCanvas.bind(this);
     this.createPoints();
     this.renderLoop();
@@ -63,7 +73,7 @@ export default class Render {
         const point = new Point({
           x: (this.grid / 2) + x * this.grid,
           y: (this.grid / 2) + y * this.grid,
-          hue: `hsl(${y * (360 / this.cols)}, 100%, 50%)`,
+          hue: y * (360 / this.cols),
           index: { x, y },
           diag: Math.round(Math.random() * 1),
         });
@@ -74,8 +84,8 @@ export default class Render {
 
   drawLine(point1, point2) {
     this.surface.beginPath();
-    this.surface.strokeStyle = point1.hue;
-    this.surface.lineWidth = 2;
+    this.surface.strokeStyle = point1.color;
+    this.surface.lineWidth = 5;
     this.surface.lineCap = 'round';
     this.surface.moveTo(point1.x, point1.y);
     this.surface.lineTo(point2.x, point2.y);
@@ -95,6 +105,8 @@ export default class Render {
   renderLoop() {
     this.surface.clearRect(0, 0, this.width, this.height);
     for (let x = 0; x < this.points.length; x++) {
+      const point = this.points[x];
+      point.update();
       if (x < this.points.length - this.rows) {
         this.connectPoints(x);
       }
