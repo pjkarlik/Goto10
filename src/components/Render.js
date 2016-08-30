@@ -64,12 +64,7 @@ export default class Render {
           x: (this.grid / 2) + x * this.grid,
           y: (this.grid / 2) + y * this.grid,
           hue: `hsl(${y * (360 / this.cols)}, 100%, 50%)`,
-          size: 3,
-          radius: 210,
-          index: {
-            x,
-            y,
-          },
+          index: { x, y },
           diag: Math.round(Math.random() * 1),
         });
         this.points.push(point);
