@@ -43,5 +43,11 @@
     "url-loader": "^0.5.7",
     "webpack": "^1.12.13",
     "webpack-dev-server": "^1.14.1"
+  },
+  "dependencies": {
+    "babel-plugin-transform-runtime": "^6.15.0",
+    "ejs": "^2.5.2",
+    "eslint-plugin-import": "^1.15.0",
+    "webpack-dev-server": "^1.15.1"
   }
 }
