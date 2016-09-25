@@ -104,17 +104,17 @@ export default class Render {
     this.element = element;
     this.grid = 25;
     this.lineThickness = 2;
+    this.points = [];
     // render const //
+    this.canvas = this.createCanvas('canvas');
     this.width = fastfloor(document.documentElement.clientWidth, window.innerWidth || 0);
     this.height = fastfloor(document.documentElement.clientHeight, window.innerHeight || 0);
     this.rows = fastfloor(this.width / this.grid);
     this.cols = fastfloor(this.height / this.grid);
-    this.points = [];
-    // Set Up canvas and surface object //
-    this.canvas = this.createCanvas('canvas');
-    this.surface = this.canvas.getContext('2d');
-    this.surface.scale(1, 1);
+    // bind functions //
     this.createPoints = this.createPoints.bind(this);
+    this.getViewport = this.getViewport.bind(this);
+    this.setViewport = this.setViewport.bind(this);
     this.resetCanvas = this.resetCanvas.bind(this);
     this.renderLoop = this.renderLoop.bind(this);
     this.createPoints();
@@ -122,25 +122,39 @@ export default class Render {
     window.addEventListener('resize', this.resetCanvas);
   }
 
+  getViewport() {
+    const width = ~~(document.documentElement.clientWidth, window.innerWidth || 0);
+    const height = ~~(document.documentElement.clientHeight, window.innerHeight || 0);
+    this.width = width;
+    this.height = height;
+    return {
+      width,
+      height,
+    };
+  }
+
+  setViewport(element) {
+    const canvasElement = element;
+    const viewPort = this.getViewport();
+    canvasElement.width = viewPort.width;
+    canvasElement.height = viewPort.height;
+  }
+
   createCanvas(name) {
     const canvasElement = document.createElement('canvas');
     canvasElement.id = name;
-    canvasElement.width = this.width;
-    canvasElement.height = this.height;
+    this.setViewport(canvasElement);
+    this.surface = canvasElement.getContext('2d');
+    this.surface.scale(1, 1);
     this.element.appendChild(canvasElement);
     return canvasElement;
   }
 
   resetCanvas() {
-    window.cancelAnimationFrame(this.renderLoop);
-    this.width = fastfloor(document.documentElement.clientWidth, window.innerWidth || 0);
-    this.height = fastfloor(document.documentElement.clientHeight, window.innerHeight || 0);
+    window.cancelAnimationFrame(this.animation);
+    this.setViewport(this.canvas);
     this.rows = fastfloor(this.width / this.grid);
     this.cols = fastfloor(this.height / this.grid);
-    this.canvas.width = this.width;
-    this.canvas.height = this.height;
-    this.surface = this.canvas.getContext('2d');
-    this.surface.scale(1, 1);
     this.points = [];
     this.createPoints();
     this.renderLoop();
@@ -194,6 +208,6 @@ export default class Render {
         this.connectPoints(x);
       }
     }
-    window.requestAnimationFrame(this.renderLoop);
+    this.animation = window.requestAnimationFrame(this.renderLoop);
   }
 }
