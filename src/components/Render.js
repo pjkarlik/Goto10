@@ -30,41 +30,56 @@ export default class Render {
     // Screen Set Up //
     this.element = element;
     this.grid = 15;
-    // render const //
-    this.width = fastfloor(document.documentElement.clientWidth, window.innerWidth || 0);
-    this.height = fastfloor(document.documentElement.clientHeight, window.innerHeight || 0);
+    this.points = [];
+    this.canvas = this.createCanvas('canvas');
     this.rows = fastfloor(this.width / this.grid);
     this.cols = fastfloor(this.height / this.grid);
-    this.points = [];
-    // Set Up canvas and surface object //
-    this.canvas = this.createCanvas('canvas');
-    this.surface = this.canvas.getContext('2d');
-    this.surface.scale(1, 1);
+    // Bind Stuff //
     this.renderLoop = this.renderLoop.bind(this);
     this.drawLine = this.drawLine.bind(this);
+    this.getViewport = this.getViewport.bind(this);
+    this.setViewport = this.setViewport.bind(this);
     this.resetCanvas = this.resetCanvas.bind(this);
     this.createPoints();
     this.renderLoop();
     window.addEventListener('resize', this.resetCanvas);
   }
-  resetCanvas() {
-    this.width = fastfloor(document.documentElement.clientWidth, window.innerWidth || 0);
-    this.height = fastfloor(document.documentElement.clientHeight, window.innerHeight || 0);
-    this.rows = fastfloor(this.width / this.grid);
-    this.cols = fastfloor(this.height / this.grid);
-    this.canvas.width = this.width;
-    this.canvas.height = this.height;
-    this.surface.scale(1, 1);
-    this.points = [];
-    this.createPoints();
+  getViewport() {
+    const width = ~~(document.documentElement.clientWidth, window.innerWidth || 0);
+    const height = ~~(document.documentElement.clientHeight, window.innerHeight || 0);
+    this.width = width;
+    this.height = height;
+    return {
+      width,
+      height,
+    };
   }
+
+  setViewport(element) {
+    const canvasElement = element;
+    const viewPort = this.getViewport();
+    canvasElement.width = viewPort.width;
+    canvasElement.height = viewPort.height;
+  }
+
   createCanvas(name) {
     const canvasElement = document.createElement('canvas');
     canvasElement.id = name;
-    canvasElement.width = this.width;
-    canvasElement.height = this.height;
+    this.setViewport(canvasElement);
+    this.surface = canvasElement.getContext('2d');
+    this.surface.scale(1, 1);
     this.element.appendChild(canvasElement);
     return canvasElement;
+  }
+
+  resetCanvas() {
+    window.cancelAnimationFrame(this.animation);
+    this.setViewport(this.canvas);
+    this.rows = fastfloor(this.width / this.grid);
+    this.cols = fastfloor(this.height / this.grid);
+    this.points = [];
+    this.createPoints();
+    this.renderLoop();
   }
 
   createPoints() {
@@ -111,6 +126,6 @@ export default class Render {
         this.connectPoints(x);
       }
     }
-    window.requestAnimationFrame(this.renderLoop);
+    this.animation = window.requestAnimationFrame(this.renderLoop);
   }
 }
