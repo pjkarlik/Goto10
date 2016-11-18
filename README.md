@@ -15,7 +15,7 @@
 
 ```bash
 $ npm install
-$ npm start & open http://localhost:9090
+$ npm run dev & open http://localhost:9090
 ```
 
 ## License
