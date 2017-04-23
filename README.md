@@ -11,7 +11,7 @@
   * Initial Commit - Create Points / Render lines.
 
 ## Run the example
-  Requires Node v6.2.1 or greater
+  Requires Node v7.0.0 or greater
 
 ```bash
 $ npm install
