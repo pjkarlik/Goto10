@@ -13,6 +13,7 @@
   My WIP version using Canvas and JavaScript to emulate the look and feel of the original program.
 
 ## Change Log
+  * Oh Snap webpack 4 - update to build.
   * AltRender - what's on my Codepen.io http://codepen.io/pjkarlik/pen/ZpzYvP
   * Initial Commit - Create Points / Render lines.
 
