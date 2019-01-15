@@ -29,7 +29,7 @@ export default class Render {
   constructor(element) {
     // Screen Set Up //
     this.element = element;
-    this.grid = 15;
+    this.grid = 10;
     this.points = [];
     this.canvas = this.createCanvas('canvas');
     this.rows = fastfloor(this.width / this.grid);
@@ -88,7 +88,7 @@ export default class Render {
         const point = new Point({
           x: (this.grid / 2) + x * this.grid,
           y: (this.grid / 2) + y * this.grid,
-          hue: y * (360 / this.cols),
+          hue: y * (80 / this.cols),
           index: { x, y },
           diag: Math.round(Math.random() * 1),
         });
@@ -100,8 +100,8 @@ export default class Render {
   drawLine(point1, point2) {
     this.surface.beginPath();
     this.surface.strokeStyle = point1.color;
-    this.surface.lineWidth = 5;
-    this.surface.lineCap = 'round';
+    this.surface.lineWidth = 3;
+    this.surface.lineCap = 'square';
     this.surface.moveTo(point1.x, point1.y);
     this.surface.lineTo(point2.x, point2.y);
     this.surface.stroke();

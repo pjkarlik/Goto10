@@ -1,3 +1,9 @@
+![travis ci build](https://travis-ci.org/pjkarlik/Goto10.svg?branch=master)
+
+![splash](./splash.png)
+
+![webpack](https://img.shields.io/badge/webpack-4.10.2-51b1c5.svg?style=flat-square) ![javascript](https://img.shields.io/badge/es6-bable-yellow.svg?style=flat-square)
+
 # GOTO 10
 
   Inspired on the Commodore64 program // 10 PRINT CHR$(205.5+RND(1)); : GOTO 10
